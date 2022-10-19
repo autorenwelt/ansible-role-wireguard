@@ -8,7 +8,7 @@
 # {{ inventory_hostname }}
 Address = {{ wireguard_address }}
 PrivateKey = {{ wireguard_private_key }}
-ListenPort = {{ wireguard_port }}
+ListenPort = {{ wireguard_listen_port if wireguard_listen_port is defined else wireguard_port }}
 {% if wireguard_dns is defined %}
 DNS = {{ wireguard_dns }}
 {% endif %}
@@ -73,7 +73,11 @@ Endpoint = {{host}}:{{hostvars[host].wireguard_port}}
 {%       endif %}
 {%     elif hostvars[host].wireguard_endpoint is defined %}
 {%       if hostvars[host].wireguard_endpoint != "" %}
+{%         if ":" in hostvars[host].wireguard_endpoint %}
+Endpoint = {{hostvars[host].wireguard_endpoint}}
+{%         else %}
 Endpoint = {{hostvars[host].wireguard_endpoint}}:{{wireguard_port}}
+{%         endif %}
 {%       else %}
 # No endpoint defined for this peer
 {%       endif %}
